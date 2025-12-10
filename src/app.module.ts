@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { MatchModule } from './match/match.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
     }),
     AuthModule,
+    MatchModule,
+    TeamModule,
     //Se usar para que el servidor sirva los archivos estáticos
     //revisar si es necesario
     // ServeStaticModule.forRoot({
