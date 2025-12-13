@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('team')
 export class TeamController {
@@ -21,22 +23,22 @@ export class TeamController {
   }
 
   @Get()
-  findAll() {
-    return this.teamService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.teamService.findAll(paginationDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.teamService.findOne(+id);
+    return this.teamService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
-    return this.teamService.update(+id, updateTeamDto);
+    return this.teamService.update(id, updateTeamDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.teamService.remove(+id);
+    return this.teamService.remove(id);
   }
 }

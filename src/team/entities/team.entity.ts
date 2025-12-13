@@ -7,4 +7,13 @@ export class Team {
 
   @Column('text')
   name: string;
+
+  @Column('text')
+  country: string;
+
+  @Column('text')
+  logoUrl?: string;
+
+  @Column('text')
+  abbreviation: string;
 }
