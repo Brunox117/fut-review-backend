@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { MatchModule } from './match/match.module';
 import { TeamModule } from './team/team.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TeamModule } from './team/team.module';
     AuthModule,
     MatchModule,
     TeamModule,
+    CommonModule,
     //Se usar para que el servidor sirva los archivos estáticos
     //revisar si es necesario
     // ServeStaticModule.forRoot({
