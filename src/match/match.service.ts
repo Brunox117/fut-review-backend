@@ -4,11 +4,13 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Match } from './entities/match.entity';
+import { Team } from '../team/entities/team.entity';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
@@ -18,9 +20,36 @@ export class MatchService {
   constructor(
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
+    @InjectRepository(Team)
+    private readonly teamRepository: Repository<Team>,
   ) {}
   async create(createMatchDto: CreateMatchDto) {
     try {
+      // Validate that both teams exist
+      const [homeTeam, awayTeam] = await Promise.all([
+        this.teamRepository.findOneBy({ id: createMatchDto.home_team_id }),
+        this.teamRepository.findOneBy({ id: createMatchDto.away_team_id }),
+      ]);
+
+      if (!homeTeam) {
+        throw new BadRequestException(
+          `Home team with id ${createMatchDto.home_team_id} not found`,
+        );
+      }
+
+      if (!awayTeam) {
+        throw new BadRequestException(
+          `Away team with id ${createMatchDto.away_team_id} not found`,
+        );
+      }
+
+      // Prevent same team playing against itself
+      if (createMatchDto.home_team_id === createMatchDto.away_team_id) {
+        throw new BadRequestException(
+          'Home team and away team cannot be the same',
+        );
+      }
+
       const match = this.matchRepository.create(createMatchDto);
       await this.matchRepository.save(match);
       return match;
@@ -36,6 +65,7 @@ export class MatchService {
       const matches = await this.matchRepository.find({
         take: limit,
         skip: offset,
+        relations: ['homeTeam', 'awayTeam'],
       });
       return matches;
     } catch (error) {
@@ -46,7 +76,10 @@ export class MatchService {
 
   async findOne(id: string) {
     try {
-      const match = await this.matchRepository.findOneBy({ id });
+      const match = await this.matchRepository.findOne({
+        where: { id },
+        relations: ['homeTeam', 'awayTeam'],
+      });
       if (!match) {
         throw new NotFoundException('Match not found');
       }
@@ -63,8 +96,45 @@ export class MatchService {
       if (!match) {
         throw new NotFoundException('Match not found');
       }
+
+      // Validate teams if they are being updated
+      if (updateMatchDto.home_team_id) {
+        const homeTeam = await this.teamRepository.findOneBy({
+          id: updateMatchDto.home_team_id,
+        });
+        if (!homeTeam) {
+          throw new BadRequestException(
+            `Home team with id ${updateMatchDto.home_team_id} not found`,
+          );
+        }
+      }
+
+      if (updateMatchDto.away_team_id) {
+        const awayTeam = await this.teamRepository.findOneBy({
+          id: updateMatchDto.away_team_id,
+        });
+        if (!awayTeam) {
+          throw new BadRequestException(
+            `Away team with id ${updateMatchDto.away_team_id} not found`,
+          );
+        }
+      }
+
+      // Prevent same team playing against itself
+      const finalHomeTeamId = updateMatchDto.home_team_id || match.home_team_id;
+      const finalAwayTeamId = updateMatchDto.away_team_id || match.away_team_id;
+
+      if (finalHomeTeamId === finalAwayTeamId) {
+        throw new BadRequestException(
+          'Home team and away team cannot be the same',
+        );
+      }
+
       await this.matchRepository.update(id, updateMatchDto);
-      return this.matchRepository.findOneBy({ id });
+      return this.matchRepository.findOne({
+        where: { id },
+        relations: ['homeTeam', 'awayTeam'],
+      });
     } catch (error) {
       this.logger.error(`[update] Error ${error}`);
       this.handleErrors(error);
