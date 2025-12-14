@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Match } from '../../match/entities/match.entity';
 
 @Entity('teams')
 export class Team {
@@ -19,4 +20,11 @@ export class Team {
 
   @Column('boolean', { default: false })
   archived: boolean;
+
+  // Relaciones bidireccionales con partidos
+  @OneToMany(() => Match, (match) => match.homeTeam)
+  homeMatches: Match[];
+
+  @OneToMany(() => Match, (match) => match.awayTeam)
+  awayMatches: Match[];
 }

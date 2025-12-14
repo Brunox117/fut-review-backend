@@ -86,6 +86,56 @@ export class TeamService {
     }
   }
 
+  // Métodos para obtener partidos del equipo
+  async getTeamWithMatches(id: string) {
+    try {
+      const team = await this.teamRepository.findOne({
+        where: { id },
+        relations: ['homeMatches', 'awayMatches'],
+      });
+      if (!team) {
+        throw new NotFoundException('Team not found');
+      }
+      return team;
+    } catch (error) {
+      this.logger.error(`[getTeamWithMatches] error ${error}`);
+      this.handleErrors(error);
+    }
+  }
+
+  async getAllTeamMatches(id: string) {
+    try {
+      const team = await this.teamRepository.findOne({
+        where: { id },
+        relations: ['homeMatches', 'awayMatches'],
+      });
+      if (!team) {
+        throw new NotFoundException('Team not found');
+      }
+
+      const allMatches = [
+        ...team.homeMatches.map((match) => ({ ...match, role: 'home' })),
+        ...team.awayMatches.map((match) => ({ ...match, role: 'away' })),
+      ];
+
+      return {
+        team: {
+          id: team.id,
+          name: team.name,
+          abbreviation: team.abbreviation,
+          country: team.country,
+        },
+        totalMatches: allMatches.length,
+        homeMatchesCount: team.homeMatches.length,
+        awayMatchesCount: team.awayMatches.length,
+        matches: allMatches,
+      };
+    } catch (error) {
+      this.logger.error(`[getAllTeamMatches] error ${error}`);
+      this.handleErrors(error);
+    }
+  }
+
   handleErrors(error: any) {
     if (error instanceof HttpException) {
       throw error;

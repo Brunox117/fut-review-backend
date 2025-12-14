@@ -41,4 +41,14 @@ export class TeamController {
   remove(@Param('id') id: string) {
     return this.teamService.remove(id);
   }
+
+  @Get(':id/matches')
+  getTeamWithMatches(@Param('id') id: string) {
+    return this.teamService.getTeamWithMatches(id);
+  }
+
+  @Get(':id/all-matches')
+  getAllTeamMatches(@Param('id') id: string) {
+    return this.teamService.getAllTeamMatches(id);
+  }
 }
