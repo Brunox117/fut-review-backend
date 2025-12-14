@@ -16,4 +16,7 @@ export class Team {
 
   @Column('text')
   abbreviation: string;
+
+  @Column('boolean', { default: false })
+  archived: boolean;
 }
