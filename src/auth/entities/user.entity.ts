@@ -1,8 +1,10 @@
+import { Review } from 'src/review/entities/review.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -25,4 +27,7 @@ export class User {
   checkFieldBeforeInsert() {
     this.email = this.email.toLowerCase().trim();
   }
+
+  @OneToMany(() => Review, (review) => review.user_id)
+  reviews: Review[];
 }

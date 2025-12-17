@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { MatchModule } from './match/match.module';
 import { TeamModule } from './team/team.module';
 import { CommonModule } from './common/common.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommonModule } from './common/common.module';
     MatchModule,
     TeamModule,
     CommonModule,
+    ReviewModule,
     //Se usar para que el servidor sirva los archivos estáticos
     //revisar si es necesario
     // ServeStaticModule.forRoot({
