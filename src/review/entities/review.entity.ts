@@ -16,8 +16,8 @@ export class Review {
   @Column('text')
   comment: string;
 
-  @Column('text')
-  rating: string;
+  @Column('number')
+  rating: number;
 
   @Column('date', { nullable: true })
   review_date?: Date;
