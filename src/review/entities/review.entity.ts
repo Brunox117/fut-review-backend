@@ -16,7 +16,7 @@ export class Review {
   @Column('text')
   comment: string;
 
-  @Column('number')
+  @Column('double precision')
   rating: number;
 
   @Column('date', { nullable: true })

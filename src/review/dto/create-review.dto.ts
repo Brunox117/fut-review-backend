@@ -24,10 +24,6 @@ export class CreateReviewDto {
   @IsNotEmpty()
   match_id: string;
 
-  @IsUUID()
-  @IsNotEmpty()
-  user_id: string;
-
   @IsDateString()
   @IsOptional()
   review_date?: Date;
